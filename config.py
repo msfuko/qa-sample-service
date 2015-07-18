@@ -5,6 +5,7 @@ class Config(object):
 
     DEBUG = True
     TESTING = False
+    KIND = 'zenoss'
 
 
 class ProductionConfig(Config):
@@ -58,6 +59,7 @@ class DevelopmentContainerConfig(DevelopmentConfig):
 class TestConfig(Config):
 
     TESTING = True
+    KIND = 'zenoss'
 
     # host
     HOST = '0.0.0.0'

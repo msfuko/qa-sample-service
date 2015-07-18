@@ -8,11 +8,12 @@ from moto.dynamodb2 import mock_dynamodb2
 from moto.sqs import mock_sqs
 from dcsqa.dao.queue import Queue
 
-class CriteriaRequestTest(unittest.TestCase):
+
+class RawRequestTest(unittest.TestCase):
 
     def setUp(self):
         self.region_name = 'us-east-1'
-        self.table_name = 'test-Criteria'
+        self.table_name = 'test-RawData'
         app.config.from_object('config.TestConfig')
         self.app = app.test_client()
 
@@ -59,23 +60,23 @@ class CriteriaRequestTest(unittest.TestCase):
         self._create_table()
 
         # test no content
-        self.assertEqual(204, self.app.get('/criteria', headers=self._get_auth_header()).status_code)
+        self.assertEqual(204, self.app.get('/zenoss/v1/raw', headers=self._get_auth_header()).status_code)
 
         # test post 400 wrong header
-        response = self.app.post('/criteria', headers=self._get_auth_header(),
+        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(),
                                  data=dict(TickeKey='testKey', Host='test'),
                                  follow_redirects=True)
         self.assertEqual(400, response.status_code)
         self.assertEqual("please send application/json", response.data)
 
         # test post 400 wrong key
-        response = self.app.post('/criteria', headers=self._get_auth_header(json=True),
+        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(json=True),
                                  data=json.dumps(dict(TicketKey='testKey')), follow_redirects=True)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("Host is not found", response.data)
+        self.assertIn("required", response.data)
 
         # test success
-        response = self.app.post('/criteria', headers=self._get_auth_header(json=True),
+        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(json=True),
                                  data=json.dumps(dict(TicketKey='testKey', Host='test')),
                                  follow_redirects=True)
         self.assertEqual(201, response.status_code)

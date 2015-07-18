@@ -2,9 +2,11 @@
 # coding: utf-8
 
 import response
+from auth import auth
 from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
-from auth import auth
+from dcsqa.model.result import ResultData
+
 
 result_blueprint = Blueprint('result', __name__)
 
@@ -49,7 +51,7 @@ def set_result_by_ticketkey_host():
     # [Validation]
     #    1. must be content-type is applicaiton/json
     #    2. JSON must be parsed successfully
-    #    3. JSON must has TicketKey
+    #    3. validate JSON string
     #    4. save to DB
     #
 
@@ -62,20 +64,20 @@ def set_result_by_ticketkey_host():
     try:
         data = request.get_json()
     except Exception as ex:
-        #criteria_blueprint.loo
         current_app.logger.error(ex)
         return response.bad_request("invalid JSON format")
 
     # 3.
-    required_key = ['TicketKey', 'Host']
-    for key in required_key:
-        if key not in data:
-            return response.bad_request("{key} is not found".format(key=key))
+    try:
+        result = ResultData(**data).get_json()
+    except Exception as ex:
+        current_app.logger.error(ex)
+        return response.bad_request(ex.message)
 
     # 4.
     dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RESULT_TABLE'],
                     logger=current_app.logger)
-    result = dao.save(data)
+    result = dao.save(result)
 
     return response.created()

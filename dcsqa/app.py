@@ -13,15 +13,22 @@ from auth import auth
 app = Flask(__name__)
 
 
+def _get_url_prefix(request_type, version='v1'):
+    """return example would be /zenoss/v1/criteria
+    """
+    return '/{kind}/{version}/{request_type}'.\
+        format(kind=app.config['KIND'], version=version, request_type=request_type)
+
+
 def create_app(app_name='dcsqa', config='config.DevelopmentConfig'):
     app.config.from_object(config)
     app.cache = Cache(app) 
 
     # register blueprint for each restful entry
     # http://flask.pocoo.org/docs/0.10/blueprints/
-    app.register_blueprint(criteria_blueprint, url_prefix='/criteria')
-    app.register_blueprint(raw_blueprint, url_prefix='/raw')
-    app.register_blueprint(result_blueprint, url_prefix='/result')
+    app.register_blueprint(criteria_blueprint, url_prefix=_get_url_prefix('criteria'))
+    app.register_blueprint(raw_blueprint, url_prefix=_get_url_prefix('raw'))
+    app.register_blueprint(result_blueprint, url_prefix=_get_url_prefix('result'))
 
     return app
 

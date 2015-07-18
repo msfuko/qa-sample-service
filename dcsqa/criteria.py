@@ -2,12 +2,15 @@
 # coding: utf-8
 
 import response
-from dcsqa.dao.table import DataTable
-from dcsqa.dao.queue import Queue
 from auth import auth
 from flask import request, Blueprint, current_app
+from dcsqa.dao.table import DataTable
+from dcsqa.dao.queue import Queue
+from dcsqa.model.criteria import CriteriaData
+
 
 criteria_blueprint = Blueprint('criteria', __name__)
+
 
 @criteria_blueprint.before_request
 @auth.login_required
@@ -60,7 +63,7 @@ def set_criteria_by_ticketkey_host():
     # [Validation]
     #    1. must be content-type is applicaiton/json
     #    2. JSON must be parsed successfully
-    #    3. JSON must has TicketKey and Host
+    #    3. validate JSON string
     #    4. save to DB
     #    5. purge cache
     #    6. enqueue
@@ -80,28 +83,29 @@ def set_criteria_by_ticketkey_host():
         return response.bad_request("invalid JSON format")
 
     # 3.
-    required_key = ['TicketKey', 'Host']
-    for key in required_key:
-        if key not in data:
-            return response.bad_request("{key} is not found".format(key=key))
+    try:
+        criteria = CriteriaData(**data).get_json()
+    except Exception as ex:
+        current_app.logger.error(ex)
+        return response.bad_request(ex.message)
 
     # 4.
     table = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
-                    table_name=current_app.config['CRITERIA_TABLE'],
-                    logger=current_app.logger)
-    result = table.save(data)
+                      table_name=current_app.config['CRITERIA_TABLE'],
+                      logger=current_app.logger)
+    result = table.save(criteria)
 
     # 5.
     current_app.cache.delete('criteria.all')
-    current_app.cache.delete("criteria.ticket_key.%s" % data['TicketKey'])
-    current_app.cache.delete("criteria.ticket_key.%s.host.%s" % (data['TicketKey'], data['Host']))
+    current_app.cache.delete("criteria.ticket_key.%s" % criteria['TicketKey'])
+    current_app.cache.delete("criteria.ticket_key.%s.host.%s" % (criteria['TicketKey'], criteria['Host']))
  
 
     # 6.
     queue = Queue(region_name=current_app.config['SQS_REGIOM'],
                   queue_name=current_app.config['SQS_NAME'],
                   logger=current_app.logger)
-    queue.push({key: data[key] for key in required_key})
+    queue.push({key: data[key] for key in ['TicketKey', 'Host']})
 
     return response.created()
 
