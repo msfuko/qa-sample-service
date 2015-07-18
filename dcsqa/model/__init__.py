@@ -31,7 +31,7 @@ class BaseObject(object):
             if isinstance(value, expected_type):
                 return self.properties.__setitem__(name, value)
             else:
-                current_app.logger.warn("Field {name} required in type {expected_type} but {current_type}, Skip".
+                current_app.logger.warn("Field {name} is required in type {expected_type} but {current_type}, Skip".
                                         format(name=name, expected_type=expected_type, current_type=type(value)))
 
     def get_json(self, indent=4, sort_keys=True, separators=(',', ': ')):
@@ -39,7 +39,7 @@ class BaseObject(object):
         for name, (default_type, required) in self.props.items():
             if required and name not in self.properties:
                 rtype = getattr(self, 'resource_type', str(default_type))
-                raise ValueError("Properties {name} required in type {rtype}".
+                raise ValueError("Properties {name} is required in type {rtype}".
                                  format(name=name, rtype=rtype))
 
         current_app.logger.debug(json.dumps(self.properties, indent=indent, sort_keys=sort_keys, separators=separators))
