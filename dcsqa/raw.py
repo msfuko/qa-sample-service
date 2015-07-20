@@ -82,7 +82,7 @@ def set_raw_by_ticketkey_host():
     dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RAW_TABLE'],
                     logger=current_app.logger)
-    result = dao.save(raw)
+    dao.save(raw)
 
     # 5.
     cache.delete_memoized(get_all_raw)

@@ -7,7 +7,7 @@ from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
 from dcsqa.dao.queue import Queue
 from dcsqa.model.criteria import CriteriaData
-
+from dcsqa.cache import cache
 
 criteria_blueprint = Blueprint('criteria', __name__)
 
@@ -19,40 +19,32 @@ def before_request():
 
 
 @criteria_blueprint.route('', methods=['GET'])
+@cache.memoize()
 def get_all_criteria():
     criteria = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                          table_name=current_app.config['CRITERIA_TABLE'],
                          logger=current_app.logger)
-    result = current_app.cache.get('criteria.all')
-    if result is None:
-        result = criteria.find_all()
-        current_app.cache.set('criteria.all', result)
-        
+    result = criteria.find_all()
     return response.get_json(result)
 
 
 @criteria_blueprint.route('/<ticket_key>', methods=['GET'])
+@cache.memoize()
 def get_criteria_by_ticketkey(ticket_key):
     criteria = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                          table_name=current_app.config['CRITERIA_TABLE'],
                          logger=current_app.logger)
-    result = current_app.cache.get("criteria.ticket_key.%s" % ticket_key)
-    if result is None:
-        result = criteria.find_by_ticketkey(ticket_key)
-        current_app.cache.set("criteria.ticket_key.%s" % ticket_key, result)
-        
+    result = criteria.find_by_ticketkey(ticket_key)
     return response.get_json(result)
 
 
 @criteria_blueprint.route('/<ticket_key>/<host>', methods=['GET'])
+@cache.memoize()
 def get_criteria_by_ticketkey_host(ticket_key, host):
     criteria = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                          table_name=current_app.config['CRITERIA_TABLE'],
                          logger=current_app.logger)
-    result = current_app.cache.get("criteria.ticket_key.%s.host.%s" % (ticket_key, host))
-    if result is None:
-        result = criteria.find_by_ticketkey_host(ticket_key, host)
-        current_app.cache.set("criteria.ticket_key.%s.host.%s" % (ticket_key, host), result)
+    result = criteria.find_by_ticketkey_host(ticket_key, host)
     return response.get_json(result)
 
 
@@ -96,10 +88,9 @@ def set_criteria_by_ticketkey_host():
     result = table.save(criteria)
 
     # 5.
-    current_app.cache.delete('criteria.all')
-    current_app.cache.delete("criteria.ticket_key.%s" % criteria['TicketKey'])
-    current_app.cache.delete("criteria.ticket_key.%s.host.%s" % (criteria['TicketKey'], criteria['Host']))
- 
+    cache.delete_memoized(get_all_criteria)
+    cache.delete_memoized(get_criteria_by_ticketkey, criteria['TicketKey'])
+    cache.delete_memoized(get_criteria_by_ticketkey_host, criteria['TicketKey'], criteria['Host'])
 
     # 6.
     queue = Queue(region_name=current_app.config['SQS_REGIOM'],

@@ -28,6 +28,7 @@ class DataTable(object):
             KeyConditionExpression=Key('TicketKey').eq(ticket_key)
         )
         if response['Count'] > 0:
+            self.logger.debug(response['Items'])
             return response['Items']
         else:
             self.logger.warn("there are no record TicketKey=%s in %s" % (ticket_key, self.table.name))
@@ -40,6 +41,7 @@ class DataTable(object):
         
         if response['Count'] > 0:
             items = response['Items']
+            self.logger.debug(items[0])
             #not return array
             return items[0]
         else:
