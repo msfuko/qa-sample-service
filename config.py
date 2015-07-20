@@ -7,6 +7,8 @@ class Config(object):
     TESTING = False
     KIND = 'zenoss'
 
+    #CACHE_DEFAULT_TIMEOUT = 500
+
 
 class ProductionConfig(Config):
 
