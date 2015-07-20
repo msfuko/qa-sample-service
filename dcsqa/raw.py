@@ -6,7 +6,7 @@ from auth import auth
 from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
 from dcsqa.model.raw import RawData
-
+from dcsqa.cache import cache
 
 raw_blueprint = Blueprint('raw', __name__)
 
@@ -16,7 +16,9 @@ raw_blueprint = Blueprint('raw', __name__)
 def before_request():
     current_app.logger.debug("user login - {user}".format(user=auth.username()))
 
+
 @raw_blueprint.route('', methods=['GET'])
+@cache.memoize()
 def get_all_raw():
     raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RAW_TABLE'],
@@ -26,6 +28,7 @@ def get_all_raw():
 
 
 @raw_blueprint.route('/<ticket_key>', methods=['GET'])
+@cache.memoize()
 def get_raw_by_ticketkey(ticket_key):
     raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RAW_TABLE'],
@@ -35,6 +38,7 @@ def get_raw_by_ticketkey(ticket_key):
 
 
 @raw_blueprint.route('/<ticket_key>/<host>', methods=['GET'])
+@cache.memoize()
 def get_raw_by_ticketkey_host(ticket_key, host):
     raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RAW_TABLE'],
@@ -52,6 +56,7 @@ def set_raw_by_ticketkey_host():
     #    2. JSON must be parsed successfully
     #    3. validate JSON string
     #    4. save to DB
+    #    5. purge cache
     #
 
     # 1.
@@ -78,5 +83,10 @@ def set_raw_by_ticketkey_host():
                     table_name=current_app.config['RAW_TABLE'],
                     logger=current_app.logger)
     result = dao.save(raw)
+
+    # 5.
+    cache.delete_memoized(get_all_raw)
+    cache.delete_memoized(get_raw_by_ticketkey, raw['TicketKey'])
+    cache.delete_memoized(get_raw_by_ticketkey_host, raw['TicketKey'], raw['Host'])
 
     return response.created()
