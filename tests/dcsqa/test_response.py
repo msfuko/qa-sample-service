@@ -22,7 +22,8 @@ class ResponseTest(TestCase):
                           u'OSType': u'linux', u'CPU': Decimal('0'),
                           u'DataPartition': [{u'name': u'/', u'size': Decimal('20000')},
                                              {u'type': u'SAS', u'local': True,
-                                              u'name': u'/trend', u'size': Decimal('80000')}]
+                                              u'name': u'/trend', u'size': Decimal('80000')}],
+                          u'AccountGroup': set([u'dcsqa', u'dcsrd'])
                          }]
 
         self.assertEqual(200, response.get_json(test_response).status_code)
