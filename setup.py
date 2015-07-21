@@ -31,7 +31,6 @@ setup(
         'mock>=1.1.2',
         'Flask-API>=0.6.3',
         'Flask-HTTPAuth',
-        'simplejson',
         'nose',
         'Flask-Testing'
     ],
