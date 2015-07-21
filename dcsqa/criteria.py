@@ -89,7 +89,7 @@ def set_criteria_by_ticketkey_host(ticket_key, host):
 
     # 5.
     cache.delete_memoized(get_all_criteria)
-    cache.delete_memoized(get_criteria_by_ticketkey, criteria['TicketKey'])
+    cache.delete_memoized(get_criteria_by_ticketkey, ticket_key)
     cache.delete_memoized(get_criteria_by_ticketkey_host, ticket_key, host)
 
     # 6.
