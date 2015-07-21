@@ -12,7 +12,12 @@ def get_json(obj):
             return int(obj)
 
     if obj is not None:
-        response = make_response(json.dumps(obj, default=_convert_decimal_to_int))
+        result = {
+            "status": status.HTTP_200_OK,
+            "errorMessage": "",
+            "result": obj
+        }
+        response = make_response(json.dumps(result, default=_convert_decimal_to_int))
     else:
         # Response does not contain any data
         response = make_response()
