@@ -47,8 +47,8 @@ def get_result_by_ticketkey_host(ticket_key, host):
     return response.get_json(result)
 
 
-@result_blueprint.route('', methods=['POST'])
-def set_result_by_ticketkey_host():
+@result_blueprint.route('/<ticket_key>/<host>', methods=['POST'])
+def set_result_by_ticketkey_host(ticket_key, host):
 
     #
     # [Validation]
@@ -82,11 +82,11 @@ def set_result_by_ticketkey_host():
     dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RESULT_TABLE'],
                     logger=current_app.logger)
-    dao.save(result)
+    dao.save(result, TicketKey=ticket_key, Host=host)
 
     # 5.
     cache.delete_memoized(get_all_result)
-    cache.delete_memoized(get_result_by_ticketkey, result['TicketKey'])
-    cache.delete_memoized(get_result_by_ticketkey_host, result['TicketKey'], result['Host'])
+    cache.delete_memoized(get_result_by_ticketkey, ticket_key)
+    cache.delete_memoized(get_result_by_ticketkey_host, ticket_key, host)
 
     return response.created()

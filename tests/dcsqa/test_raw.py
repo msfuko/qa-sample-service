@@ -63,21 +63,13 @@ class RawRequestTest(unittest.TestCase):
         self.assertEqual(204, self.app.get('/zenoss/v1/raw', headers=self._get_auth_header()).status_code)
 
         # test post 400 wrong header
-        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(),
-                                 data=dict(TickeKey='testKey', Host='test'),
-                                 follow_redirects=True)
+        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(),
+                                 data=dict(Alert=['4']), follow_redirects=True)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("please send application/json", response.data)
-
-        # test post 400 wrong key
-        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(json=True),
-                                 data=json.dumps(dict(TicketKey='testKey')), follow_redirects=True)
-        self.assertEqual(400, response.status_code)
-        self.assertIn("required", response.data)
+        self.assertIn("please send application/json", response.data)
 
         # test success
-        response = self.app.post('/zenoss/v1/raw', headers=self._get_auth_header(json=True),
-                                 data=json.dumps(dict(TicketKey='testKey', Host='test')),
-                                 follow_redirects=True)
+        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
+                                 data=json.dumps(dict(Alert=['4'])), follow_redirects=True)
         self.assertEqual(201, response.status_code)
 

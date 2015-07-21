@@ -47,8 +47,8 @@ def get_raw_by_ticketkey_host(ticket_key, host):
     return response.get_json(result)
 
 
-@raw_blueprint.route('', methods=['POST'])
-def set_raw_by_ticketkey_host():
+@raw_blueprint.route('/<ticket_key>/<host>', methods=['POST'])
+def set_raw_by_ticketkey_host(ticket_key, host):
 
     #
     # [Validation]
@@ -82,11 +82,11 @@ def set_raw_by_ticketkey_host():
     dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RAW_TABLE'],
                     logger=current_app.logger)
-    dao.save(raw)
+    dao.save(raw, TicketKey=ticket_key, Host=host)
 
     # 5.
     cache.delete_memoized(get_all_raw)
-    cache.delete_memoized(get_raw_by_ticketkey, raw['TicketKey'])
-    cache.delete_memoized(get_raw_by_ticketkey_host, raw['TicketKey'], raw['Host'])
+    cache.delete_memoized(get_raw_by_ticketkey, ticket_key)
+    cache.delete_memoized(get_raw_by_ticketkey_host, ticket_key, host)
 
     return response.created()

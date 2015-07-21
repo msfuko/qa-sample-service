@@ -4,8 +4,6 @@ from . import BaseObject
 class ResultData(BaseObject):
 
     props = {
-        'TicketKey': (basestring, True),
-        'Host': (basestring, True),
         'Alert': (int, False),
         'Collector': (int, False),
         'DeviceStatus': (int, False),

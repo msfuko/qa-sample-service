@@ -4,8 +4,6 @@ from . import BaseObject
 class RawData(BaseObject):
 
     props = {
-        'TicketKey': (basestring, True),
-        'Host': (basestring, True),
         'Alert': (list, False),
         'Collector': (basestring, False),
         'DeviceStatus': (basestring, False),

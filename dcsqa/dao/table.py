@@ -48,12 +48,13 @@ class DataTable(object):
             self.logger.warn("there are no record TicketKey=%s, Host=%s in %s" % (ticket_key, host, self.table.name))
             return None
         
-    def save(self, item):
+    def save(self, item, **kwargs):
         """
         Save item into Table
         :param item: (dict) of saved item
         :return:
         """
+        item.update(kwargs)
         response = self.table.put_item(Item=item)
         self.logger.info(response)
         return response

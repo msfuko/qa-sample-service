@@ -2,20 +2,20 @@ import unittest
 from dcsqa.app import app
 import dcsqa.response as response
 from decimal import Decimal
+from flask import Flask
+from flask.ext.testing import TestCase
 
-class ResponseTest(unittest.TestCase):
 
-    def setUp(self):
+class ResponseTest(TestCase):
+
+    def create_app(self):
         #
-        # to resolve 'working outside of application context' error when make_reponse
-        # refer to http://flask.pocoo.org/docs/0.10/appcontext/
+        # for making response
+        # refer to - http://pythonhosted.org/Flask-Testing/
         #
+        app = Flask(__name__)
         app.config.from_object('config.TestConfig')
-        self.app_context = app.app_context()
-        self.app_context.push()
-
-    def tearDown(self):
-        self.app_context.pop()
+        return app
 
     def test_get_json(self):
         test_response = [{u'Hostname': u'dcs-qauat01.sjdc', u'Memory': Decimal('0'),
@@ -30,9 +30,9 @@ class ResponseTest(unittest.TestCase):
         self.assertEqual(204, response.get_json(None).status_code)
 
     def test_bad_request(self):
-        self.assertEqual(400, response.bad_request("it's really bad").status_code)
-        self.assertEqual("it's really bad", response.bad_request("it's really bad").data)
+        test_response = response.bad_request("it's really bad")
+        self.assertEqual(400, test_response.status_code)
+        self.assertIn("it's really bad", response.bad_request("it's really bad").data)
 
     def test_created(self):
         self.assertEqual(201, response.created().status_code)
-        self.assertEqual("ok", response.created().data)

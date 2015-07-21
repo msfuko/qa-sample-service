@@ -48,8 +48,8 @@ def get_criteria_by_ticketkey_host(ticket_key, host):
     return response.get_json(result)
 
 
-@criteria_blueprint.route('', methods=['POST'])
-def set_criteria_by_ticketkey_host():
+@criteria_blueprint.route('/<ticket_key>/<host>', methods=['POST'])
+def set_criteria_by_ticketkey_host(ticket_key, host):
     
     #
     # [Validation]
@@ -85,18 +85,18 @@ def set_criteria_by_ticketkey_host():
     table = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                       table_name=current_app.config['CRITERIA_TABLE'],
                       logger=current_app.logger)
-    result = table.save(criteria)
+    result = table.save(criteria, TicketKey=ticket_key, Host=host)
 
     # 5.
     cache.delete_memoized(get_all_criteria)
     cache.delete_memoized(get_criteria_by_ticketkey, criteria['TicketKey'])
-    cache.delete_memoized(get_criteria_by_ticketkey_host, criteria['TicketKey'], criteria['Host'])
+    cache.delete_memoized(get_criteria_by_ticketkey_host, ticket_key, host)
 
     # 6.
     queue = Queue(region_name=current_app.config['SQS_REGION'],
                   queue_name=current_app.config['SQS_NAME'],
                   logger=current_app.logger)
-    queue.push({key: data[key] for key in ['TicketKey', 'Host']})
+    queue.push({'TicketKey': ticket_key, 'Host': host})
 
     return response.created()
 

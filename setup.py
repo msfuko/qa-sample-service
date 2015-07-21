@@ -32,6 +32,7 @@ setup(
         'Flask-API>=0.6.3',
         'Flask-HTTPAuth',
         'simplejson',
-        'nose'
+        'nose',
+        'Flask-Testing'
     ],
 )

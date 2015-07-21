@@ -4,8 +4,6 @@ from . import BaseObject
 class CriteriaData(BaseObject):
 
     props = {
-        'TicketKey': (basestring, True),
-        'Host': (basestring, True),
         'Alert': (bool, True),
         'Collector': (bool, True),
         'DeviceStatus': (bool, True),
