@@ -22,7 +22,7 @@ class ProductionConfig(Config):
     RESULT_TABLE = 'QAPortal-Staging-QAResult'
 
     # sqs
-    SQS_REGIOM = 'us-west-1'
+    SQS_REGION = 'us-west-1'
     SQS_NAME = 'QATaskQueue-Staging'
     
     # cache
@@ -45,7 +45,7 @@ class DevelopmentConfig(Config):
     RESULT_TABLE = 'QAPortal-POC-QAResult'
 
     # sqs
-    SQS_REGIOM = 'us-east-1'
+    SQS_REGION = 'us-east-1'
     SQS_NAME = 'QATaskQueue-POC'
     
     # cache
@@ -73,7 +73,7 @@ class TestConfig(Config):
     RESULT_TABLE = 'test-QAResult'
 
     # sqs
-    SQS_REGIOM = 'us-east-1'
+    SQS_REGION = 'us-east-1'
     SQS_NAME = 'test-POC'
     
     # cache

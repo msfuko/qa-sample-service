@@ -93,7 +93,7 @@ def set_criteria_by_ticketkey_host():
     cache.delete_memoized(get_criteria_by_ticketkey_host, criteria['TicketKey'], criteria['Host'])
 
     # 6.
-    queue = Queue(region_name=current_app.config['SQS_REGIOM'],
+    queue = Queue(region_name=current_app.config['SQS_REGION'],
                   queue_name=current_app.config['SQS_NAME'],
                   logger=current_app.logger)
     queue.push({key: data[key] for key in ['TicketKey', 'Host']})
