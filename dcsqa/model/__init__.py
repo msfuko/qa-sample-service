@@ -3,10 +3,13 @@ The class is the super class of all models, which will check the props map in su
 Using for validate whether the data type of props is expected
 """
 import json
+from abc import ABCMeta, abstractproperty
 from flask import current_app
 
 
 class BaseObject(object):
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, **kwargs):
         # Cache the keys for validity checks
@@ -33,6 +36,10 @@ class BaseObject(object):
             else:
                 current_app.logger.warn("Field {name} is required in type {expected_type} but {current_type}, Skip".
                                         format(name=name, expected_type=expected_type, current_type=type(value)))
+
+    @abstractproperty
+    def props(self):
+        return dict()
 
     def get_json(self, indent=4, sort_keys=True, separators=(',', ': ')):
         # check if the required fields are all in

@@ -1,27 +1,35 @@
-import json
-import decimal
+import simplejson as json
 from flask import make_response
 from flask.ext.api import status
+from flask import jsonify
 
 
 def get_json(obj):
-    def _convert_decimal_to_int(obj):
-        if isinstance(obj, decimal.Decimal):
-            return int(obj)
-
-    if obj is not None:
-        response = make_response(json.dumps(obj, default=_convert_decimal_to_int))
-    else:
-        response = make_response('', status.HTTP_204_NO_CONTENT)
-
-    response.mimetype = 'application/json'
-
+    response_status = status.HTTP_204_NO_CONTENT if obj is None else status.HTTP_200_OK
+    response = jsonify({
+        "status": response_status,
+        "errorMessage": "",
+        "result": obj
+    })
+    response.status_code = response_status
     return response
 
 
 def bad_request(message):
-    return make_response(message, status.HTTP_400_BAD_REQUEST)
+    response = jsonify({
+        "status": status.HTTP_400_BAD_REQUEST,
+        "errorMessage": message
+    })
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return response
 
 
 def created():
-    return make_response('ok', status.HTTP_201_CREATED)
+    response = jsonify({
+        "status": status.HTTP_201_CREATED,
+        "errorMessage": ""
+    })
+    response.status_code = status.HTTP_201_CREATED
+    return response
+
+
