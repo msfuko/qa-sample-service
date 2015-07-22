@@ -56,7 +56,7 @@ class RawRequestTest(unittest.TestCase):
 
     @mock_dynamodb2
     @mock.patch('dcsqa.criteria.Queue')
-    def test_post_criteria(self, mock_queue):
+    def test_post_raw(self, mock_queue):
         self._create_table()
 
         # test no content
@@ -68,8 +68,13 @@ class RawRequestTest(unittest.TestCase):
         self.assertEqual(400, response.status_code)
         self.assertIn("please send application/json", response.data)
 
-        # test success
+        # test validation
         response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
                                  data=json.dumps(dict(Alert=['4'])), follow_redirects=True)
+        self.assertEqual(400, response.status_code)
+
+        # test success
+        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
+                                 data=json.dumps(dict(Alert=['4'], woTemplateVersion=110)), follow_redirects=True)
         self.assertEqual(201, response.status_code)
 

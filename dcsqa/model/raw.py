@@ -4,6 +4,7 @@ from . import BaseObject
 class RawData(BaseObject):
 
     props = {
+        'woTemplateVersion': (int, True),
         'Alert': (list, False),
         'Collector': (basestring, False),
         'DeviceStatus': (basestring, False),

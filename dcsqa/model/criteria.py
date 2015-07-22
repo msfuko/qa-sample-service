@@ -4,6 +4,7 @@ from . import BaseObject
 class CriteriaData(BaseObject):
 
     props = {
+        'woTemplateVersion': (int, True),
         'Alert': (bool, True),
         'Collector': (bool, True),
         'DeviceStatus': (bool, True),
