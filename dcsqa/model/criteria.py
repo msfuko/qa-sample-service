@@ -5,6 +5,9 @@ class CriteriaData(BaseObject):
 
     props = {
         'woTemplateVersion': (int, True),
+        'OsType': (basestring, True),       # for checking it's esxi or not
+        'Datacenter': (basestring, True),   # for checking collector
+        'SystemName': (basestring, True),   # for checking which zenoss site
         'Alert': (bool, True),
         'Collector': (bool, True),
         'DeviceStatus': (bool, True),
@@ -13,7 +16,5 @@ class CriteriaData(BaseObject):
         'ProductionState': (bool, True),
         'Template': (list, True),
         'IPAddress': (list, True),
-        'Datacenter': (basestring, True),
-        'SystemName': (basestring, True),
         'FQDN': (basestring, True)
         }
