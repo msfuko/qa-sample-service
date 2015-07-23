@@ -5,6 +5,7 @@ class ResultData(BaseObject):
 
     props = {
         'woTemplateVersion': (int, True),
+        'Summary': (int, True),
         'Alert': (int, False),
         'Collector': (int, False),
         'DeviceStatus': (int, False),

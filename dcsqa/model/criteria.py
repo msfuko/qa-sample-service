@@ -13,7 +13,7 @@ class CriteriaData(BaseObject):
         'DeviceStatus': (bool, True),
         'FileSystem': (bool, True),
         'Processors': (bool, True),
-        'ProductionState': (bool, True),
+        'ProductionState': (basestring, True),
         'Template': (list, True),
         'IPAddress': (list, True),
         'FQDN': (basestring, True)
