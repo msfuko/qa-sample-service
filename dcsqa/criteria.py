@@ -6,7 +6,6 @@ from auth import auth
 from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
 from dcsqa.dao.queue import Queue
-from dcsqa.model.criteria import CriteriaData
 from dcsqa.cache import cache
 
 criteria_blueprint = Blueprint('criteria', __name__)
@@ -73,6 +72,11 @@ def set_criteria_by_ticketkey_host(ticket_key, host):
     except Exception as ex:
         current_app.logger.warn("couldn't parse JSON %s" % ex)
         return response.bad_request("invalid JSON format")
+
+    if data.get('isVirtual'):
+        from dcsqa.model.vm.criteria import CriteriaData
+    else:
+        from dcsqa.model.esxi.criteria import CriteriaData
 
     # 3.
     try:

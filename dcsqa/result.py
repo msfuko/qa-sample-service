@@ -5,7 +5,7 @@ import response
 from auth import auth
 from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
-from dcsqa.model.result import ResultData
+from dcsqa.model.esxi.result import ResultData
 from dcsqa.cache import cache
 
 result_blueprint = Blueprint('result', __name__)

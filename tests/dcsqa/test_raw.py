@@ -60,21 +60,21 @@ class RawRequestTest(unittest.TestCase):
         self._create_table()
 
         # test no content
-        self.assertEqual(204, self.app.get('/zenoss/v1/raw', headers=self._get_auth_header()).status_code)
+        self.assertEqual(204, self.app.get('/vsphere/v1/raw', headers=self._get_auth_header()).status_code)
 
         # test post 400 wrong header
-        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(),
+        response = self.app.post('/vsphere/v1/raw/testKey/test', headers=self._get_auth_header(),
                                  data=dict(Alert=['4']), follow_redirects=True)
         self.assertEqual(400, response.status_code)
         self.assertIn("please send application/json", response.data)
 
         # test validation
-        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
+        response = self.app.post('/vsphere/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
                                  data=json.dumps(dict(Alert=['4'])), follow_redirects=True)
         self.assertEqual(400, response.status_code)
 
         # test success
-        response = self.app.post('/zenoss/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
+        response = self.app.post('/vsphere/v1/raw/testKey/test', headers=self._get_auth_header(json=True),
                                  data=json.dumps(dict(Alert=['4'], woTemplateVersion=110)), follow_redirects=True)
         self.assertEqual(201, response.status_code)
 

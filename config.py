@@ -5,7 +5,7 @@ class Config(object):
 
     DEBUG = True
     TESTING = False
-    KIND = 'zenoss'
+    KIND = 'vsphere'
 
     #CACHE_DEFAULT_TIMEOUT = 500
 
@@ -17,13 +17,13 @@ class ProductionConfig(Config):
 
     # dynamodb
     DYNAMODB_REGION = 'us-west-1'
-    CRITERIA_TABLE = 'QAPortal-Staging-Criteria'
-    RAW_TABLE = 'QAPortal-Staging-RawData'
-    RESULT_TABLE = 'QAPortal-Staging-QAResult'
+    CRITERIA_TABLE = 'QAPortal-vSphere-Staging-Criteria'
+    RAW_TABLE = 'QAPortal-vSphere-Staging-RawData'
+    RESULT_TABLE = 'QAPortal-vSphere-Staging-QAResult'
 
     # sqs
     SQS_REGION = 'us-west-1'
-    SQS_NAME = 'QATaskQueue-Staging'
+    SQS_NAME = 'QATaskQueue-vSphere-Staging'
     
     # cache
     # http://pythonhosted.org/Flask-Cache/#configuring-flask-cache
@@ -40,13 +40,13 @@ class DevelopmentConfig(Config):
 
     # dynamodb
     DYNAMODB_REGION = 'us-east-1'
-    CRITERIA_TABLE = 'QAPortal-POC-Criteria'
-    RAW_TABLE = 'QAPortal-POC-RawData'
-    RESULT_TABLE = 'QAPortal-POC-QAResult'
+    CRITERIA_TABLE = 'QAPortal-vSphere-POC-Criteria'
+    RAW_TABLE = 'QAPortal-vSphere-POC-RawData'
+    RESULT_TABLE = 'QAPortal-vSphere-POC-QAResult'
 
     # sqs
     SQS_REGION = 'us-east-1'
-    SQS_NAME = 'QATaskQueue-POC'
+    SQS_NAME = 'QATaskQueue-vSphere-POC'
     
     # cache
     CACHE_TYPE = 'simple'
