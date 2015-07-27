@@ -7,6 +7,7 @@ class CriteriaData(BaseObject):
         'woTemplateVersion': (int, True),
         'isVirtual': (bool, True),
         'Hypervisor': (basestring, True),         # temporary adding - for hypervisor name or cluster name
-        'Datastore': (list, True)
+        'Datastore': (list, True),
+        'CPU': (int, True)
     }
 

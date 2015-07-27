@@ -4,7 +4,7 @@
 
 import boto3
 import logging
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key, Attr, And
 
 
 class DataTable(object):
@@ -47,7 +47,33 @@ class DataTable(object):
         else:
             self.logger.warn("there are no record TicketKey=%s, Host=%s in %s" % (ticket_key, host, self.table.name))
             return None
-        
+
+    def find_by_ticketkey_status(self, ticket_key, status):
+        response = self.table.query(
+            IndexName="Summary-index",
+            KeyConditionExpression=Key('TicketKey').eq(ticket_key) & Key('Summary').eq(int(status))
+        )
+        if response['Count'] > 0:
+            self.logger.debug(response['Items'])
+            return response['Items']
+        else:
+            self.logger.warn("there are no record TicketKey=%s greater than %s in %s"
+                             % (ticket_key, status, self.table.name))
+            return None
+
+    def find_by_ticketkey_gt_status(self, ticket_key, status):
+        response = self.table.query(
+            IndexName="Summary-index",
+            KeyConditionExpression=Key('TicketKey').eq(ticket_key) & Key('Summary').gt(int(status))
+        )
+        if response['Count'] > 0:
+            self.logger.debug(response['Items'])
+            return response['Items']
+        else:
+            self.logger.warn("there are no record TicketKey=%s greater than %s in %s"
+                             % (ticket_key, status, self.table.name))
+            return None
+
     def save(self, item, **kwargs):
         """
         Save item into Table

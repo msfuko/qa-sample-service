@@ -2,6 +2,8 @@
 # coding: utf-8
 
 import response
+import urllib
+import re
 from auth import auth
 from flask import request, Blueprint, current_app
 from dcsqa.dao.table import DataTable
@@ -20,30 +22,61 @@ def before_request():
 @result_blueprint.route('', methods=['GET'])
 @cache.memoize()
 def get_all_result():
-    raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
+    dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RESULT_TABLE'],
                     logger=current_app.logger)
-    result = raw.find_all()
+    result = dao.find_all()
     return response.get_json(result)
 
 
 @result_blueprint.route('/<ticket_key>', methods=['GET'])
-@cache.memoize()
 def get_result_by_ticketkey(ticket_key):
-    raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
+    query_status = request.args.get('summary')
+    if query_status:
+        condition = re.match(r'gt:(?P<status>.*)', query_status, re.M | re.I)
+        if query_status.isdigit():
+            return _get_result_by_ticketkey_status(ticket_key, query_status)
+        elif condition:
+            return _get_result_by_ticketkey_gt_status(ticket_key, condition.group('status'))
+        else:
+            return response.bad_request("Unsupported query string")
+    else:
+        return _get_result_by_ticketkey(ticket_key)
+
+
+@cache.memoize()
+def _get_result_by_ticketkey(ticket_key):
+    dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RESULT_TABLE'],
                     logger=current_app.logger)
-    result = raw.find_by_ticketkey(ticket_key)
+    result = dao.find_by_ticketkey(ticket_key)
+    return response.get_json(result)
+
+
+def _get_result_by_ticketkey_status(ticket_key, query_status):
+    dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
+                    table_name=current_app.config['RESULT_TABLE'],
+                    logger=current_app.logger)
+    result = dao.find_by_ticketkey_status(ticket_key, query_status)
+    return response.get_json(result)
+
+
+def _get_result_by_ticketkey_gt_status(ticket_key, query_status):
+    dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
+                    table_name=current_app.config['RESULT_TABLE'],
+                    logger=current_app.logger)
+    result = dao.find_by_ticketkey_gt_status(ticket_key, query_status)
     return response.get_json(result)
 
 
 @result_blueprint.route('/<ticket_key>/<host>', methods=['GET'])
 @cache.memoize()
 def get_result_by_ticketkey_host(ticket_key, host):
-    raw = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
+    dao = DataTable(region_name=current_app.config['DYNAMODB_REGION'],
                     table_name=current_app.config['RESULT_TABLE'],
                     logger=current_app.logger)
-    result = raw.find_by_ticketkey_host(ticket_key, host)
+
+    result = dao.find_by_ticketkey_host(ticket_key, host)
     return response.get_json(result)
 
 
@@ -86,7 +119,7 @@ def set_result_by_ticketkey_host(ticket_key, host):
 
     # 5.
     cache.delete_memoized(get_all_result)
-    cache.delete_memoized(get_result_by_ticketkey, ticket_key)
+    cache.delete_memoized(_get_result_by_ticketkey, ticket_key)
     cache.delete_memoized(get_result_by_ticketkey_host, ticket_key, host)
 
     return response.created()

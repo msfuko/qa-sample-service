@@ -61,7 +61,6 @@ class DevelopmentContainerConfig(DevelopmentConfig):
 class TestConfig(Config):
 
     TESTING = True
-    KIND = 'zenoss'
 
     # host
     HOST = '0.0.0.0'

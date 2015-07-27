@@ -7,6 +7,7 @@ class CriteriaData(BaseObject):
         'woTemplateVersion': (int, True),
         'isVirtual': (bool, True),
         'FQDN': (basestring, True),
-        'Version': (basestring, True)
+        'Version': (basestring, True),
+        'Account': (list, True)
     }
 
